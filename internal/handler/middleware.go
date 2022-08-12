@@ -18,7 +18,6 @@ func (h *Handler) userIdentity(c *fiber.Ctx) error {
 	if string(header) == "" {
 		return c.Status(fiber.StatusUnauthorized).SendString("empty auth header")
 	}
-
 	headerParts := strings.Split(string(header), " ")
 	if len(headerParts) != 2 || headerParts[0] != "Bearer" {
 		return c.Status(fiber.StatusUnauthorized).SendString("empty auth header")
