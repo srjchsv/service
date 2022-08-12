@@ -8,10 +8,12 @@ type AuthPostgres struct {
 	db *sqlx.DB
 }
 
+//NewAuthPostgres return a db instance
 func NewAuthPostgres(db *sqlx.DB) *AuthPostgres {
 	return &AuthPostgres{db: db}
 }
 
+//CreateUser creates user in db
 func (r *AuthPostgres) CreateUser(user User) (int, error) {
 	var id int
 
@@ -23,6 +25,7 @@ func (r *AuthPostgres) CreateUser(user User) (int, error) {
 	return id, nil
 }
 
+//GetUser gets user by username and password
 func (r *AuthPostgres) GetUser(username, password string) (User, error) {
 	var user User
 	err := r.db.Get(&user, "SELECT id FROM users WHERE username=$1 AND password=$2", username, password)

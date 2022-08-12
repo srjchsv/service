@@ -1,4 +1,6 @@
-TOKEN=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NjAzNjMwNTgsImlhdCI6MTY2MDMxOTg1OCwidXNlcl9pZCI6MX0.5AEFok-UESeXy0ykdywkbjnvQXY0rLCjWeBVmEZBd18
+TOKEN=
+
+PORT=:8080
 
 run:
 	@go run cmd/app/main.go
@@ -10,10 +12,10 @@ down:
 	@goose -dir ./internal/repository/migrations  postgres "user=user password=password dbname=db sslmode=disable" down
 
 signup:
-	@curl -v -X POST -H 'Accept: application/json' -H 'Content-Type: application/json' --data '{"name":"larry", "username":"larr", "password":"123"}' http://localhost:5000/auth/sign-up
+	@curl -v -X POST -H 'Accept: application/json' -H 'Content-Type: application/json' --data '{"name":"larry", "username":"larr", "password":"123"}' http://localhost${PORT}/auth/sign-up
 
 signin:
-	@curl -v -X POST -H 'Accept: application/json' -H 'Content-Type: application/json' --data '{"username":"larr", "password":"123"}' http://localhost:5000/auth/sign-in
+	@curl -v -X POST -H 'Accept: application/json' -H 'Content-Type: application/json' --data '{"username":"larr", "password":"123"}' http://localhost${PORT}/auth/sign-in
 
 api:
-	@curl -v -H 'Accept: application/json' -H 'Authorization: Bearer ${TOKEN}' http://localhost:5000/api
+	@curl -v -H 'Accept: application/json' -H 'Authorization: Bearer ${TOKEN}' http://localhost${PORT}/api

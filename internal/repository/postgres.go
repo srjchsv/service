@@ -3,26 +3,36 @@ package repository
 import (
 	"fmt"
 
-	"os"
-
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	"github.com/sirupsen/logrus"
 )
 
-func ConnectToDB(dbHost string) (*sqlx.DB, error) {
-	conn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable", dbHost, os.Getenv("POSTGRES_USER"), os.Getenv("POSTGRES_PASSWORD"), os.Getenv("POSTGRES_DB"))
+type DbConfig struct {
+	Host     string
+	Port     string
+	Username string
+	Password string
+	DbName   string
+}
 
+// ConnectToDB initializes db connection
+func ConnectToDB(config *DbConfig) (*sqlx.DB, error) {
+	conn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable",
+		config.Host,
+		config.Username,
+		config.Password,
+		config.DbName)
+	var err error
 	db, err := sqlx.Open("postgres", conn)
 	if err != nil {
 		logrus.Fatal(err)
 	}
-
 	return db, nil
 }
 
+// CreateTableIfNotExist create table users if not exists
 func CreateTableIfNotExists(db *sqlx.DB) {
-	
 	schema := `CREATE TABLE IF NOT EXISTS users(
     id serial not null unique,
     name varchar(255) not null,
@@ -34,5 +44,4 @@ func CreateTableIfNotExists(db *sqlx.DB) {
 		logrus.Fatal(err)
 		return
 	}
-	logrus.Info("Created table users")
 }

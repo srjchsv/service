@@ -10,21 +10,17 @@ type Handler struct {
 	services *services.Service
 }
 
+// NewHandler creates a handler instance of services
 func NewHandler(services *services.Service) *Handler {
 	return &Handler{services: services}
 }
 
+// InitRouter register router and sets handlers
 func (h *Handler) InitRouter(app *fiber.App) *fiber.App {
 	app.Use(logger.New())
-	// app.Use(favicon.New(favicon.Config{
-	// 	File: "./static/resources/favicon.ico",
-	// }))
 
 	auth := app.Group("/auth")
 	auth.Post("/sign-up", h.signUp)
-	auth.Get("/sign-up", func(c *fiber.Ctx) error {
-		return c.SendString("Signup here...")
-	})
 	auth.Post("/sign-in", h.signIn)
 
 	apiV1 := app.Group("/api", h.userIdentity)

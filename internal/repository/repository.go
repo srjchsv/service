@@ -9,6 +9,7 @@ type User struct {
 	Password string `json:"password" binding:"required"`
 }
 
+//Authorization methods for repository
 type Authorization interface {
 	CreateUser(User) (int, error)
 	GetUser(username, password string) (User, error)
@@ -18,6 +19,7 @@ type Repository struct {
 	Authorization
 }
 
+//NewRepository creates an instance of database handler
 func NewRepository(db *sqlx.DB) *Repository {
 	return &Repository{Authorization: NewAuthPostgres(db)}
 }

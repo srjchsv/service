@@ -7,6 +7,7 @@ import (
 	"github.com/srjchsv/service/internal/repository"
 )
 
+//SignUp performs users sign-up on handlers level
 func (h *Handler) signUp(c *fiber.Ctx) error {
 	var input repository.User
 
@@ -28,6 +29,7 @@ type signInInput struct {
 	Password string `json:"password" binding:"required"`
 }
 
+//SignIn performs users sign-in on handlers level
 func (h *Handler) signIn(c *fiber.Ctx) error {
 	var input signInInput
 

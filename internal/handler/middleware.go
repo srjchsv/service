@@ -12,6 +12,7 @@ const (
 	userCtx             = "userID"
 )
 
+//userIdentity is a authentification middleware
 func (h *Handler) userIdentity(c *fiber.Ctx) error {
 	header := c.Request().Header.Peek(authorizationHeader)
 
