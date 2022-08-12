@@ -1,0 +1,22 @@
+version: '3'
+services:
+  db:
+    image: postgres:14.4-alpine
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - ${POSTGRES_PORT}
+    volumes:
+      - db:/var/lib/postgres/data
+  # api:
+  #   build: .
+  #   env_file:
+  #     - .env
+  #   depends_on:
+  #     - db
+  #   ports:
+  #    - 5000:5000
+  #   restart: always
+volumes:
+  db:
