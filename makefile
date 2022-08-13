@@ -1,6 +1,6 @@
 TOKEN=
 
-PORT=:8080
+PORT=:5000
 
 run:
 	@go run cmd/app/main.go

@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
 	"github.com/srjchsv/service/internal/handler"
@@ -19,7 +19,6 @@ func main() {
 	}
 	dbConfig := repository.DbConfig{
 		Host:     os.Getenv("POSTGRES_HOST"),
-		Port:     os.Getenv("POSTGRES_PORT"),
 		Username: os.Getenv("POSTGRES_USER"),
 		Password: os.Getenv("POSTGRES_PASSWORD"),
 		DbName:   os.Getenv("POSTGRES_DB"),
@@ -33,16 +32,19 @@ func main() {
 	//Create table if not exits
 	repository.CreateTableIfNotExists(db)
 
-	// Initialize dependent app structure
+	// --Initialize multi layer clean architecture structure--
+	// repos is taking care of storing things
 	repos := repository.NewRepository(db)
+	// services  taking care of business
 	services := services.NewService(repos)
+	// top level handles requests & responses and routing
 	handlers := handler.NewHandler(services)
-	
+
 	//Initialize a server instance
-	app := fiber.New()
+	r := gin.Default()
 	// Initialize router
-	handlers.InitRouter(app)
+	handlers.InitRouter(r)
 
 	//Run server
-	logrus.Fatal(app.Listen(os.Getenv("PORT")))
+	logrus.Fatal(r.Run(os.Getenv("PORT")))
 }

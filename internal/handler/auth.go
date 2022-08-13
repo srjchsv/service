@@ -1,25 +1,26 @@
 package handler
 
 import (
-	"time"
+	"net/http"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/gin-gonic/gin"
 	"github.com/srjchsv/service/internal/repository"
 )
 
-//SignUp performs users sign-up on handlers level
-func (h *Handler) signUp(c *fiber.Ctx) error {
+// SignUp performs users sign-up on handlers level
+func (h *Handler) signUp(c *gin.Context) {
 	var input repository.User
 
-	if err := c.BodyParser(&input); err != nil {
-		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+	if err := c.BindJSON(&input); err != nil {
+		newErrorReponse(c, http.StatusBadRequest, "invalid input body")
+		return
 	}
 	id, err := h.services.Authorization.CreateUser(input)
 	if err != nil {
-		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+		newErrorReponse(c, http.StatusInternalServerError, err.Error())
+		return
 	}
-
-	return c.JSON(map[string]interface{}{
+	c.JSON(http.StatusOK, map[string]interface{}{
 		"id": id,
 	})
 }
@@ -29,28 +30,31 @@ type signInInput struct {
 	Password string `json:"password" binding:"required"`
 }
 
-//SignIn performs users sign-in on handlers level
-func (h *Handler) signIn(c *fiber.Ctx) error {
+// SignIn performs users sign-in on handlers level
+func (h *Handler) signIn(c *gin.Context) {
 	var input signInInput
 
-	if err := c.BodyParser(&input); err != nil {
-		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+	if err := c.BindJSON(&input); err != nil {
+		newErrorReponse(c, http.StatusBadRequest, err.Error())
+		return
 	}
 
 	token, err := h.services.Authorization.GenerateToken(input.Username, input.Password)
 	if err != nil {
-		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+		newErrorReponse(c, http.StatusInternalServerError, err.Error())
+		return
 	}
-
-	c.Cookie(&fiber.Cookie{
-		Name:     "access_token",
-		Value:    token,
-		Expires:  time.Now().Add(24 * time.Hour),
-		HTTPOnly: true,
-		Secure:   true,
-	})
-
-	return c.JSON(map[string]interface{}{
+	
+	c.SetCookie(
+		"access_token",
+		token,
+		60*60*24,
+		"/",
+		"/",
+		true,
+		true,
+	)
+	c.JSON(http.StatusOK, map[string]interface{}{
 		"token": token,
 	})
 }
