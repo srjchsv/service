@@ -35,7 +35,7 @@ func (h *Handler) signIn(c *gin.Context) {
 	var input signInInput
 
 	if err := c.BindJSON(&input); err != nil {
-		newErrorReponse(c, http.StatusBadRequest, err.Error())
+		newErrorReponse(c, http.StatusBadRequest, "invalid input body")
 		return
 	}
 
@@ -44,7 +44,7 @@ func (h *Handler) signIn(c *gin.Context) {
 		newErrorReponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
-	
+
 	c.SetCookie(
 		"access_token",
 		token,

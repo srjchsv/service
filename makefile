@@ -2,6 +2,9 @@ TOKEN=
 
 PORT=:5000
 
+MOCK_SOURCE=
+MOCK_DESTINATION=
+
 run:
 	@go run cmd/app/main.go
 	
@@ -19,3 +22,11 @@ signin:
 
 api:
 	@curl -v -H 'Accept: application/json' -H 'Authorization: Bearer ${TOKEN}' http://localhost${PORT}/api
+
+coverage:
+	@go test -coverprofile=coverage.out ./...
+	@go tool cover -html=coverage.out
+	@rm coverage.out
+
+mockgen:
+	@mockgen -source=${MOCK_SOURCE} -destination=${MOCK_DESTINATION}

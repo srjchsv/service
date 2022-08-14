@@ -13,7 +13,7 @@ import (
 const (
 	salt       = "fsfdf34444dijisjdfjdfi"
 	signingKey = "1@#edwdDSD$$"
-	tokenTTL    = 12 * time.Hour
+	tokenTTL   = 12 * time.Hour
 )
 
 type tokenClaims struct {
@@ -25,18 +25,18 @@ type AuthService struct {
 	repo repository.Authorization
 }
 
-//NewAuthService returns a authservice of repo
+// NewAuthService returns a authservice of repo
 func NewAuthService(repo repository.Authorization) *AuthService {
 	return &AuthService{repo: repo}
 }
 
-//CreateUser sets passowrd hash and craeate user in db and return ids
+// CreateUser sets passowrd hash and craeate user in db and return ids
 func (s *AuthService) CreateUser(user repository.User) (int, error) {
 	user.Password = generatePasswordHash(user.Password)
 	return s.repo.CreateUser(user)
 }
 
-//GenerateToken generates and returns token
+// GenerateToken generates and returns token
 func (s *AuthService) GenerateToken(username, password string) (string, error) {
 	user, err := s.repo.GetUser(username, generatePasswordHash(password))
 	if err != nil {
@@ -54,7 +54,7 @@ func (s *AuthService) GenerateToken(username, password string) (string, error) {
 	return token.SignedString([]byte(signingKey))
 }
 
-//ParseToken parses and returns token
+// ParseToken parses and returns token
 func (s *AuthService) ParseToken(accessToken string) (int, error) {
 	token, err := jwt.ParseWithClaims(accessToken, &tokenClaims{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -63,7 +63,7 @@ func (s *AuthService) ParseToken(accessToken string) (int, error) {
 		return []byte(signingKey), nil
 	})
 	if err != nil {
-		return 0, err
+		return 0, errors.New("token contains an invalid number of segments")
 	}
 
 	claims, ok := token.Claims.(*tokenClaims)
@@ -73,7 +73,7 @@ func (s *AuthService) ParseToken(accessToken string) (int, error) {
 	return claims.UserID, nil
 }
 
-//generatePasswordHash hashes the password
+// generatePasswordHash hashes the password
 func generatePasswordHash(password string) string {
 	hash := sha1.New()
 	hash.Write([]byte(password))
