@@ -16,6 +16,8 @@ services:
     build: .
     env_file:
       - .env
+    environment:
+      - POSTGRES_HOST=postgres 
     ports:
      - 5000
     restart: always

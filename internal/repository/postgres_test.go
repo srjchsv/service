@@ -1,11 +1,20 @@
 package repository
 
 import (
+	"os"
 	"testing"
 
+	"github.com/joho/godotenv"
+	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 )
 
+func init() {
+	err := godotenv.Load("../../.env")
+	if err != nil {
+		logrus.Fatal(err)
+	}
+}
 func TestRepository_ConnectToDB(t *testing.T) {
 
 	tests := []struct {
@@ -16,10 +25,10 @@ func TestRepository_ConnectToDB(t *testing.T) {
 		{
 			name: "ok",
 			dbConfig: DbConfig{
-				Host:     "localhost",
-				Username: "user",
-				Password: "password",
-				DbName:   "db",
+				Host:     os.Getenv("POSTGRES_HOST"),
+				Username: os.Getenv("POSTGRES_USER"),
+				Password: os.Getenv("POSTGRES_PASSWORD"),
+				DbName:   os.Getenv("POSTGRES_DB"),
 			},
 			expectedError: false,
 		},
@@ -50,7 +59,6 @@ func TestRepository_ConnectToDB(t *testing.T) {
 }
 
 func TestRepository_CreateTableIfNotExists(t *testing.T) {
-
 	tests := []struct {
 		name          string
 		dbConfig      DbConfig
@@ -59,10 +67,10 @@ func TestRepository_CreateTableIfNotExists(t *testing.T) {
 		{
 			name: "ok",
 			dbConfig: DbConfig{
-				Host:     "localhost",
-				Username: "user",
-				Password: "password",
-				DbName:   "db",
+				Host:     os.Getenv("POSTGRES_HOST"),
+				Username: os.Getenv("POSTGRES_USER"),
+				Password: os.Getenv("POSTGRES_PASSWORD"),
+				DbName:   os.Getenv("POSTGRES_DB"),
 			},
 			expectedError: false,
 		},
