@@ -8,9 +8,14 @@
 -More feature
 
 ### To run "prod" use `docker compose up`
+### To run postgres db for dev use `docker compose up db`
 
-### Makefile commands to test authorization endpoint
+## Makefile commands to test endpoints:
+###
 
+_for prod change variable PORT=:8080_
+
+_for dev change variable PORT=:5000_
 - `make signup` - perform a user registration
 - `make signin` - sign in as a registered user. Get a token.
 - `make api` - check if a signed in user with jwt token can be authenticated at a secured endpoint. Add a token to a variable TOKEN before using this command.
