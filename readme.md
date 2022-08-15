@@ -7,20 +7,24 @@
 ### To be made:
 -More feature
 
-### To run "prod" use `docker compose up`
-### To run postgres db for dev use `docker compose up db`
+### To run "prod" use `docker compose up --build`
+### To run postgres db for dev and test use `docker compose up db`
 
-## Makefile commands to test endpoints:
+## Makefile commands to test endpoints (not containerised):
 ###
-
-_for prod change variable PORT=:8080_
-
-_for dev change variable PORT=:5000_
+#### for local dev use:
 - `make signup` - perform a user registration
-- `make signin` - sign in as a registered user. Get a token.
-- `make api` - check if a signed in user with jwt token can be authenticated at a secured endpoint. Add a token to a variable TOKEN before using this command.
-- `make coverage` - to run test and show coverage in the default browser.
-
+- `make signin` - sign in as a registered user. Get a token. Set cookie.
+- `make api` - check if a signed in user with jwt token can be authenticated at a secured endpoint.
+- `make refresh` - refresh token.
+- `make logout` - delete cookie with token. logout.
+### - `make coverage` - to run test and show coverage in the default browser.
+#### for running docker container use:
+- `make signupProd` - perform a user registration
+- `make signinProd` - sign in as a registered user. Get a token. Set cookie.
+- `make apiProd` - check if a signed in user with jwt token can be authenticated at a secured endpoint.
+- `make refreshProd` - refresh token.
+- `make logoutProd` - delete cookie with token. logout.
 
 useful links:
 - jwt, clean architecture, project structure, patterns, api https://www.youtube.com/watch?v=1LFbmWk7NLQ&list=PLbTTxxr-hMmyFAvyn7DeOgNRN8BQdjFm8&index=1

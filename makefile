@@ -3,8 +3,8 @@ TOKEN=
 DEV_PORT=:5000
 PROD_PORT=:8080
 
-MOCK_SOURCE=
-MOCK_DESTINATION=
+MOCK_SOURCE=./internal/services/service.go
+MOCK_DESTINATION=./internal/services/mock/mock.go
 
 run:
 	@docker compose up db -d
@@ -15,20 +15,35 @@ signup:
 	@curl -v -X POST -H 'Accept: application/json' -H 'Content-Type: application/json' --data '{"name":"larry", "username":"larr", "password":"123"}' http://localhost${DEV_PORT}/auth/sign-up
 
 signin:
-	@curl -v -X POST -H 'Accept: application/json' -H 'Content-Type: application/json' --data '{"username":"larr", "password":"123"}' http://localhost${DEV_PORT}/auth/sign-in
+	@curl -v -c cookie.txt -X POST -H 'Accept: application/json' -H 'Content-Type: application/json' --data '{"username":"larr", "password":"123"}' http://localhost${DEV_PORT}/auth/sign-in
+
+refresh:
+	@curl -v -b ./cookie.txt -c ./cookie.txt -X POST http://localhost${DEV_PORT}/auth/refresh-token
 
 api:
-	@curl -v -H 'Accept: application/json' -H 'Authorization: Bearer ${TOKEN}' http://localhost${DEV_PORT}/api
+	@curl -v -b ./cookie.txt -X GET http://localhost${DEV_PORT}/api
+
+logout:
+	@curl -v -b ./cookie.txt -X POST http://localhost${DEV_PORT}/auth/logout
+	@rm cookie.txt
 
 # PROD COMMANDS
 signupProd:
 	@curl -v -X POST -H 'Accept: application/json' -H 'Content-Type: application/json' --data '{"name":"larry", "username":"larr", "password":"123"}' http://localhost${PROD_PORT}/auth/sign-up
 
 signinProd:
-	@curl -v -X POST -H 'Accept: application/json' -H 'Content-Type: application/json' --data '{"username":"larr", "password":"123"}' http://localhost${PROD_PORT}/auth/sign-in
+	@curl -v -c cookie.txt -X POST -H 'Accept: application/json' -H 'Content-Type: application/json' --data '{"username":"larr", "password":"123"}' http://localhost${PROD_PORT}/auth/sign-in
+
+refreshProd:
+	@curl -v -b ./cookie.txt -c ./cookie.txt -X POST http://localhost${PROD_PORT}/auth/refresh-token
 
 apiProd:
-	@curl -v -H 'Accept: application/json' -H 'Authorization: Bearer ${TOKEN}' http://localhost${DEV_PORT}/api
+	@curl -v -b ./cookie.txt -X GET http://localhost${PROD_PORT}/api
+
+logoutProd:
+	@curl -v -b ./cookie.txt -X POST http://localhost${PROD_PORT}/auth/logout
+	@rm cookie.txt
+
 
 # TESTS
 coverage:

@@ -80,3 +80,21 @@ func generatePasswordHash(password string) string {
 
 	return fmt.Sprintf("%x", hash.Sum([]byte(salt)))
 }
+
+func (s *AuthService) RefreshToken(token string, userID int) (string, error) {
+
+	generateToken := jwt.NewWithClaims(jwt.SigningMethodHS256, &tokenClaims{
+		jwt.StandardClaims{
+			ExpiresAt: time.Now().Add(tokenTTL).Unix(),
+			IssuedAt:  time.Now().Unix(),
+		},
+		userID,
+	})
+
+	newToken, err := generateToken.SignedString([]byte(signingKey))
+	if err != nil {
+		return "", err
+	}
+
+	return newToken, err
+}

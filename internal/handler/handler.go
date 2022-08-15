@@ -18,13 +18,14 @@ func NewHandler(services *services.Service) *Handler {
 
 // InitRouter register router and sets handlers
 func (h *Handler) InitRouter(app *gin.Engine) *gin.Engine {
-
 	auth := app.Group("/auth")
 	auth.POST("/sign-up", h.signUp)
 	auth.POST("/sign-in", h.signIn)
+	auth.POST("/refresh-token", h.refreshToken)
+	auth.POST("/logout", h.logout)
 
 	apiV1 := app.Group("/api", h.userIdentity)
-	apiV1.GET("/", func(c *gin.Context) {
+	apiV1.GET("", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"message": "Hi you are in the secured route...",
 		})

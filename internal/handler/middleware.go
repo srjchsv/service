@@ -2,7 +2,6 @@ package handler
 
 import (
 	"net/http"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -14,24 +13,16 @@ const (
 
 // userIdentity is a authentification middleware
 func (h *Handler) userIdentity(c *gin.Context) {
-	header := c.GetHeader(authorizationHeader)
-
-	if header == "" {
-		newErrorReponse(c, http.StatusUnauthorized, "empty auth header")
+	token, err := c.Cookie("access_token")
+	if err != nil {
+		if err == http.ErrNoCookie {
+			newErrorReponse(c, http.StatusUnauthorized, "no cookie access_token")
+			return
+		}
+		newErrorReponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
-	headerParts := strings.Split(string(header), " ")
-	if len(headerParts) != 2 || headerParts[0] != "Bearer" {
-		newErrorReponse(c, http.StatusUnauthorized, "invalid auth header")
-		return
-	}
-
-	if len(headerParts[1]) == 0 {
-		newErrorReponse(c, http.StatusUnauthorized, "token is empty")
-		return
-	}
-
-	userID, err := h.services.Authorization.ParseToken(headerParts[1])
+	userID, err := h.services.Authorization.ParseToken(token)
 	if err != nil {
 		newErrorReponse(c, http.StatusUnauthorized, err.Error())
 		return

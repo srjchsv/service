@@ -48,7 +48,7 @@ func main() {
 	r := gin.Default()
 	// Initialize router
 	handlers.InitRouter(r)
-
+	
 	//Run server
 	logrus.Fatal(r.Run(os.Getenv("PORT")))
 }
