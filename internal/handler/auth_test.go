@@ -77,7 +77,7 @@ func TestHandler_signUp(t *testing.T) {
 			test.mockBehavior(repo, test.inputUser)
 
 			services := &services.Service{Authorization: repo}
-			handler := &Handler{services: services}
+			handler := NewHandler(services)
 
 			//Init endpoint
 			r := gin.New()
@@ -155,7 +155,7 @@ func TestHandler_signIn(t *testing.T) {
 			test.mockBehavior(repo, test.inputUser)
 
 			services := &services.Service{Authorization: repo}
-			handler := &Handler{services: services}
+			handler := NewHandler(services)
 
 			//Init endpoint
 			r := gin.New()

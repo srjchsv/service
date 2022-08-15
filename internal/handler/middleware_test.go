@@ -76,7 +76,7 @@ func TestHandler_userIdentity(t *testing.T) {
 		repo := mock_services.NewMockAuthorization(c)
 		test.mockBehavior(repo)
 		services := &services.Service{Authorization: repo}
-		handler := &Handler{services: services}
+		handler := NewHandler(services)
 
 		r := gin.New()
 		apiV1 := r.Group("/api", handler.userIdentity)

@@ -5,7 +5,6 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
-	"github.com/sirupsen/logrus"
 )
 
 type DbConfig struct {
@@ -26,13 +25,14 @@ func ConnectToDB(config *DbConfig) (*sqlx.DB, error) {
 	var err error
 	db, err := sqlx.Open("postgres", conn)
 	if err != nil {
-		logrus.Fatal(err)
+		return nil, err
 	}
+
 	return db, nil
 }
 
 // CreateTableIfNotExist create table users if not exists
-func CreateTableIfNotExists(db *sqlx.DB) {
+func CreateTableIfNotExists(db *sqlx.DB) error {
 	schema := `CREATE TABLE IF NOT EXISTS users(
     id serial not null unique,
     name varchar(255) not null,
@@ -41,7 +41,7 @@ func CreateTableIfNotExists(db *sqlx.DB) {
 );`
 	_, err := db.Exec(schema)
 	if err != nil {
-		logrus.Fatal(err)
-		return
+		return err
 	}
+	return nil
 }

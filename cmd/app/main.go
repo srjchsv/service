@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"os"
 
 	"github.com/gin-gonic/gin"
@@ -30,7 +31,10 @@ func main() {
 	}
 	defer db.Close()
 	//Create table if not exits
-	repository.CreateTableIfNotExists(db)
+	err = repository.CreateTableIfNotExists(db)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	// --Initialize multi layer clean architecture structure--
 	// repos is taking care of storing things

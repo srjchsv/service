@@ -64,6 +64,19 @@ func TestService_GenerateToken(t *testing.T) {
 
 func TestService_ParseToken(t *testing.T) {
 
+	//init dependencies
+	c := gomock.NewController(t)
+	defer c.Finish()
+
+	repo := mock_repository.NewMockAuthorization(c)
+
+	repo.EXPECT().GetUser("username", "6673666466333434343464696a69736a64666a6466695baa61e4c9b93f3f0682250b6cf8331b7ee68fd8").Return(repository.User{
+		ID: 1,
+	}, nil)
+
+	s := NewAuthService(repo)
+	token, _ := s.GenerateToken("username", "password")
+
 	tests := []struct {
 		name          string
 		inputToken    string
@@ -72,7 +85,7 @@ func TestService_ParseToken(t *testing.T) {
 	}{
 		{
 			name:          "ok",
-			inputToken:    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NjA1NTAyMDIsImlhdCI6MTY2MDUwNzAwMiwidXNlcl9pZCI6MX0.PJtZzvUjY6IHOtAUOiesLgJ2Sft0JkOBM-_2pUf5duw",
+			inputToken:    token,
 			expected:      1,
 			expectedError: nil,
 		},

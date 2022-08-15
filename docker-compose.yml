@@ -39,6 +39,6 @@ services:
     networks:
       - api.network
 volumes:
-  db:
+  db: 
 networks:
   api.network:
