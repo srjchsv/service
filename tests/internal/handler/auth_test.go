@@ -8,9 +8,10 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
+	"github.com/srjchsv/service/internal/handler"
 	"github.com/srjchsv/service/internal/repository"
 	"github.com/srjchsv/service/internal/services"
-	mock_services "github.com/srjchsv/service/internal/services/mock"
+	mock_services "github.com/srjchsv/service/tests/internal/services/mock"
 	"github.com/stretchr/testify/require"
 )
 
@@ -77,16 +78,15 @@ func TestHandler_signUp(t *testing.T) {
 			test.mockBehavior(repo, test.inputUser)
 
 			services := &services.Service{Authorization: repo}
-			handler := NewHandler(services)
+			handler := handler.NewHandler(services)
 
 			//Init endpoint
 			r := gin.New()
-
-			r.POST("/sign-up", handler.signUp)
+			handler.InitRouter(r)
 
 			//Create request
 			w := httptest.NewRecorder()
-			req := httptest.NewRequest("POST", "/sign-up", bytes.NewBufferString(test.inputBody))
+			req := httptest.NewRequest("POST", "/auth/sign-up", bytes.NewBufferString(test.inputBody))
 
 			r.ServeHTTP(w, req)
 			require.Equal(t, test.expectedResponseBody, w.Body.String())
@@ -155,14 +155,15 @@ func TestHandler_signIn(t *testing.T) {
 			test.mockBehavior(repo, test.inputUser)
 
 			services := &services.Service{Authorization: repo}
-			handler := NewHandler(services)
+			handler := handler.NewHandler(services)
 
 			//Init endpoint
 			r := gin.New()
-			r.POST("/sign-in", handler.signIn)
+			handler.InitRouter(r)
+
 			//Create request
 			w := httptest.NewRecorder()
-			req := httptest.NewRequest("POST", "/sign-in", bytes.NewBufferString(test.inputBody))
+			req := httptest.NewRequest("POST", "/auth/sign-in", bytes.NewBufferString(test.inputBody))
 
 			r.ServeHTTP(w, req)
 

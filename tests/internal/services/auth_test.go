@@ -6,7 +6,8 @@ import (
 
 	"github.com/golang/mock/gomock"
 	"github.com/srjchsv/service/internal/repository"
-	mock_repository "github.com/srjchsv/service/internal/repository/mock"
+	"github.com/srjchsv/service/internal/services"
+	mock_repository "github.com/srjchsv/service/tests/internal/repository/mock"
 	"github.com/stretchr/testify/require"
 )
 
@@ -54,7 +55,7 @@ func TestService_GenerateToken(t *testing.T) {
 			repo := mock_repository.NewMockAuthorization(c)
 			test.mockBehavior(repo, test.inputUser)
 
-			s := NewAuthService(repo)
+			s := services.NewAuthService(repo)
 			_, err := s.GenerateToken(test.inputUser.Username, test.inputUser.Password)
 
 			require.Equal(t, test.expectedResponse, err)
@@ -74,7 +75,7 @@ func TestService_ParseToken(t *testing.T) {
 		ID: 1,
 	}, nil)
 
-	s := NewAuthService(repo)
+	s := services.NewAuthService(repo)
 	token, _ := s.GenerateToken("username", "password")
 
 	tests := []struct {
@@ -102,7 +103,7 @@ func TestService_ParseToken(t *testing.T) {
 			defer c.Finish()
 
 			repo := mock_repository.NewMockAuthorization(c)
-			s := NewAuthService(repo)
+			s := services.NewAuthService(repo)
 			id, err := s.ParseToken(test.inputToken)
 
 			require.Equal(t, test.expectedError, err)

@@ -6,25 +6,26 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
+	"github.com/srjchsv/service/internal/repository"
 	"github.com/stretchr/testify/require"
 )
 
 func init() {
-	err := godotenv.Load("../../.env")
+	err := godotenv.Load("../../../.env")
 	if err != nil {
 		logrus.Fatal(err)
 	}
 }
 func TestRepository_ConnectToDB(t *testing.T) {
-
+	
 	tests := []struct {
 		name          string
-		dbConfig      DbConfig
+		dbConfig      repository.DbConfig
 		expectedError bool
 	}{
 		{
 			name: "ok",
-			dbConfig: DbConfig{
+			dbConfig: repository.DbConfig{
 				Host:     os.Getenv("POSTGRES_HOST"),
 				Username: os.Getenv("POSTGRES_USER"),
 				Password: os.Getenv("POSTGRES_PASSWORD"),
@@ -34,7 +35,7 @@ func TestRepository_ConnectToDB(t *testing.T) {
 		},
 		{
 			name:          "config error",
-			dbConfig:      DbConfig{},
+			dbConfig:      repository.DbConfig{},
 			expectedError: true,
 		},
 	}
@@ -42,7 +43,7 @@ func TestRepository_ConnectToDB(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			var errBool bool
-			db, err := ConnectToDB(&test.dbConfig)
+			db, err := repository.ConnectToDB(&test.dbConfig)
 			if err != nil {
 				errBool = true
 			}
@@ -61,12 +62,12 @@ func TestRepository_ConnectToDB(t *testing.T) {
 func TestRepository_CreateTableIfNotExists(t *testing.T) {
 	tests := []struct {
 		name          string
-		dbConfig      DbConfig
+		dbConfig      repository.DbConfig
 		expectedError bool
 	}{
 		{
 			name: "ok",
-			dbConfig: DbConfig{
+			dbConfig: repository.DbConfig{
 				Host:     os.Getenv("POSTGRES_HOST"),
 				Username: os.Getenv("POSTGRES_USER"),
 				Password: os.Getenv("POSTGRES_PASSWORD"),
@@ -76,7 +77,7 @@ func TestRepository_CreateTableIfNotExists(t *testing.T) {
 		},
 		{
 			name: "config error",
-			dbConfig: DbConfig{
+			dbConfig: repository.DbConfig{
 				Host:     "",
 				Username: "user",
 				Password: "password",
@@ -89,9 +90,9 @@ func TestRepository_CreateTableIfNotExists(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			var errBool bool
-			db, _ := ConnectToDB(&test.dbConfig)
+			db, _ := repository.ConnectToDB(&test.dbConfig)
 			defer db.Close()
-			err := CreateTableIfNotExists(db)
+			err := repository.CreateTableIfNotExists(db)
 			if err != nil {
 				errBool = true
 			}

@@ -7,8 +7,7 @@ import (
 )
 
 const (
-	authorizationHeader = "Authorization"
-	userCtx             = "userID"
+	userCtx = "userID"
 )
 
 // userIdentity is a authentification middleware
