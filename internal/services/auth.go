@@ -54,7 +54,7 @@ func (s *AuthService) GenerateToken(username, password string) (string, error) {
 	return token.SignedString([]byte(signingKey))
 }
 
-// ParseToken parses and returns token
+// ParseToken parses and returns userID
 func (s *AuthService) ParseToken(accessToken string) (int, error) {
 	token, err := jwt.ParseWithClaims(accessToken, &tokenClaims{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -81,8 +81,15 @@ func generatePasswordHash(password string) string {
 	return fmt.Sprintf("%x", hash.Sum([]byte(salt)))
 }
 
+// RefreshToken refreshes JWT token
 func (s *AuthService) RefreshToken(token string, userID int) (string, error) {
-
+	parsedUserID, err := s.ParseToken(token)
+	if err != nil {
+		return "", err
+	}
+	if parsedUserID != userID {
+		return "", errors.New("cannot refresh token")
+	}
 	generateToken := jwt.NewWithClaims(jwt.SigningMethodHS256, &tokenClaims{
 		jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(tokenTTL).Unix(),
@@ -90,7 +97,6 @@ func (s *AuthService) RefreshToken(token string, userID int) (string, error) {
 		},
 		userID,
 	})
-
 	newToken, err := generateToken.SignedString([]byte(signingKey))
 	if err != nil {
 		return "", err

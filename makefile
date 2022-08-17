@@ -1,9 +1,7 @@
-TOKEN=
-
 DEV_PORT=:5000
 PROD_PORT=:8080
 
-MOCK_SOURCE=./internal/services/service.go
+MOCK_SOURCE=./internal/services/services.go
 MOCK_DESTINATION=./internal/services/mock/mock.go
 
 run:
@@ -48,7 +46,7 @@ logoutProd:
 # TESTS
 coverage:
 	@docker compose up db -d
-	@POSTGRES_HOST=localhost go test -coverprofile=coverage.out ./...
+	@POSTGRES_HOST=localhost go test -coverprofile=coverage.out -coverpkg=./... ./...
 	@go tool cover -html=coverage.out
 	@rm coverage.out
 	@docker compose down

@@ -3,6 +3,7 @@ package handler
 import (
 	"bytes"
 	"errors"
+	"net/http"
 	"net/http/httptest"
 	"testing"
 
@@ -14,6 +15,11 @@ import (
 	mock_services "github.com/srjchsv/service/tests/internal/services/mock"
 	"github.com/stretchr/testify/require"
 )
+
+type Cookie struct {
+	Name  string
+	Value string
+}
 
 func TestHandler_signUp(t *testing.T) {
 	type mockBehavior func(r *mock_services.MockAuthorization, user repository.User)
@@ -153,7 +159,6 @@ func TestHandler_signIn(t *testing.T) {
 
 			repo := mock_services.NewMockAuthorization(c)
 			test.mockBehavior(repo, test.inputUser)
-
 			services := &services.Service{Authorization: repo}
 			handler := handler.NewHandler(services)
 
@@ -165,6 +170,148 @@ func TestHandler_signIn(t *testing.T) {
 			w := httptest.NewRecorder()
 			req := httptest.NewRequest("POST", "/auth/sign-in", bytes.NewBufferString(test.inputBody))
 
+			r.ServeHTTP(w, req)
+
+			require.Equal(t, test.expectedStatusCode, w.Code)
+			require.Equal(t, test.expectedResponseBody, w.Body.String())
+		})
+	}
+}
+
+func TestHandler_refreshToken(t *testing.T) {
+	type mockBehavior func(r *mock_services.MockAuthorization)
+
+	tests := []struct {
+		name                 string
+		cookie               Cookie
+		mockBehavior         mockBehavior
+		expectedStatusCode   int
+		expectedResponseBody string
+	}{
+		{
+			name:   "ok",
+			cookie: Cookie{Name: "access_token", Value: "token"},
+			mockBehavior: func(r *mock_services.MockAuthorization) {
+				r.EXPECT().ParseToken("token").Return(1, nil)
+				r.EXPECT().RefreshToken("token", 1).Return("newToken", nil)
+			},
+			expectedStatusCode:   200,
+			expectedResponseBody: `{"token":"newToken"}`,
+		},
+		{
+			name:   "no cookie",
+			cookie: Cookie{Name: "", Value: ""},
+			mockBehavior: func(r *mock_services.MockAuthorization) {
+			},
+			expectedStatusCode:   401,
+			expectedResponseBody: `{"message":"no cookie access_token"}`,
+		},
+		{
+			name:   "no token",
+			cookie: Cookie{Name: "access_token", Value: ""},
+			mockBehavior: func(r *mock_services.MockAuthorization) {
+				r.EXPECT().ParseToken("").Return(0, errors.New("no token"))
+
+			},
+			expectedStatusCode:   401,
+			expectedResponseBody: `{"message":"no token"}`,
+		},
+		{
+			name:   "not matching id",
+			cookie: Cookie{Name: "access_token", Value: "token"},
+			mockBehavior: func(r *mock_services.MockAuthorization) {
+				r.EXPECT().ParseToken("token").Return(1, nil)
+				r.EXPECT().RefreshToken("token", 1).Return("", errors.New("cant refresh"))
+			},
+			expectedStatusCode:   401,
+			expectedResponseBody: `{"message":"cant refresh"}`,
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			//Init dependancies
+			c := gomock.NewController(t)
+			defer c.Finish()
+
+			repo := mock_services.NewMockAuthorization(c)
+			test.mockBehavior(repo)
+			services := &services.Service{Authorization: repo}
+			handler := handler.NewHandler(services)
+
+			//Init endpoint
+			r := gin.New()
+			gin.SetMode(gin.ReleaseMode)
+			handler.InitRouter(r)
+
+			//Create request
+			w := httptest.NewRecorder()
+			req := httptest.NewRequest("POST", "/auth/refresh-token", nil)
+			req.AddCookie(&http.Cookie{Name: test.cookie.Name, Value: test.cookie.Value})
+			r.ServeHTTP(w, req)
+
+			require.Equal(t, test.expectedStatusCode, w.Code)
+			require.Equal(t, test.expectedResponseBody, w.Body.String())
+		})
+	}
+}
+
+func TestHandler_logout(t *testing.T) {
+	type mockBehavior func(r *mock_services.MockAuthorization)
+	tests := []struct {
+		name                 string
+		cookie               Cookie
+		mockBehavior         mockBehavior
+		expectedStatusCode   int
+		expectedResponseBody string
+	}{
+		{
+			name:   "ok",
+			cookie: Cookie{Name: "access_token", Value: "token"},
+			mockBehavior: func(r *mock_services.MockAuthorization) {
+				r.EXPECT().ParseToken("token").Return(1, nil)
+			},
+			expectedStatusCode:   200,
+			expectedResponseBody: `{"logout":"success"}`,
+		},
+		{
+			name:   "no cookie",
+			cookie: Cookie{Name: "", Value: ""},
+			mockBehavior: func(r *mock_services.MockAuthorization) {
+			},
+			expectedStatusCode:   401,
+			expectedResponseBody: `{"message":"no cookie access_token"}`,
+		},
+		{
+			name:   "no token",
+			cookie: Cookie{Name: "access_token", Value: ""},
+			mockBehavior: func(r *mock_services.MockAuthorization) {
+				r.EXPECT().ParseToken("").Return(0, errors.New("no token"))
+
+			},
+			expectedStatusCode:   401,
+			expectedResponseBody: `{"message":"no token"}`,
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			//Init dependancies
+			c := gomock.NewController(t)
+			defer c.Finish()
+
+			repo := mock_services.NewMockAuthorization(c)
+			test.mockBehavior(repo)
+			services := &services.Service{Authorization: repo}
+			handler := handler.NewHandler(services)
+
+			//Init endpoint
+			r := gin.New()
+			gin.SetMode(gin.ReleaseMode)
+			handler.InitRouter(r)
+
+			//Create request
+			w := httptest.NewRecorder()
+			req := httptest.NewRequest("POST", "/auth/logout", nil)
+			req.AddCookie(&http.Cookie{Name: test.cookie.Name, Value: test.cookie.Value})
 			r.ServeHTTP(w, req)
 
 			require.Equal(t, test.expectedStatusCode, w.Code)

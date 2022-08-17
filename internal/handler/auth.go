@@ -86,7 +86,8 @@ func (h *Handler) refreshToken(c *gin.Context) {
 
 	newToken, err := h.services.Authorization.RefreshToken(token, userID)
 	if err != nil {
-		newErrorReponse(c, http.StatusInternalServerError, err.Error())
+		newErrorReponse(c, http.StatusUnauthorized, err.Error())
+		return
 	}
 
 	c.SetCookie(

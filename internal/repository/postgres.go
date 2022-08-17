@@ -13,6 +13,7 @@ type DbConfig struct {
 	Username string
 	Password string
 	DbName   string
+	Pool     string
 }
 
 // ConnectToDB initializes db connection
@@ -27,7 +28,6 @@ func ConnectToDB(config *DbConfig) (*sqlx.DB, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	return db, nil
 }
 

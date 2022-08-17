@@ -3,6 +3,8 @@ package main
 import (
 	"log"
 	"os"
+	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -23,6 +25,7 @@ func main() {
 		Username: os.Getenv("POSTGRES_USER"),
 		Password: os.Getenv("POSTGRES_PASSWORD"),
 		DbName:   os.Getenv("POSTGRES_DB"),
+		Pool:     os.Getenv("POSTGRES_POOL"),
 	}
 	db, err := repository.ConnectToDB(&dbConfig)
 	//Connect to db
@@ -35,6 +38,14 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	//Set db connection pool
+	maxOpenConn, err := strconv.Atoi(dbConfig.Pool)
+	if err != nil {
+		log.Fatal(err)
+	}
+	db.SetMaxOpenConns(maxOpenConn)
+	db.SetMaxIdleConns(maxOpenConn)
+	db.SetConnMaxIdleTime(time.Hour)
 
 	// --Initialize multi layer clean architecture structure--
 	// repos is taking care of storing things
@@ -48,7 +59,7 @@ func main() {
 	r := gin.Default()
 	// Initialize router
 	handlers.InitRouter(r)
-	
+
 	//Run server
 	logrus.Fatal(r.Run(os.Getenv("PORT")))
 }
