@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	userCtx = "userID"
+	userCtx = "UserID"
 )
 
 // userIdentity is a authentification middleware

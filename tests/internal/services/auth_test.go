@@ -32,7 +32,7 @@ func generateTokenForTest(t *testing.T) string {
 }
 
 func TestService_GenerateToken(t *testing.T) {
-	type mockBehavior func(r *mock_repository.MockAuthorization, user repository.User)
+	type mockBehavior func(r *mock_repository.MockAuthorization)
 
 	tests := []struct {
 		name          string
@@ -46,7 +46,7 @@ func TestService_GenerateToken(t *testing.T) {
 				Username: "username",
 				Password: "password",
 			},
-			mockBehavior: func(r *mock_repository.MockAuthorization, user repository.User) {
+			mockBehavior: func(r *mock_repository.MockAuthorization) {
 				r.EXPECT().GetUser("username", "6673666466333434343464696a69736a64666a6466695baa61e4c9b93f3f0682250b6cf8331b7ee68fd8").Return(repository.User{
 					ID: 1,
 				}, nil)
@@ -58,7 +58,7 @@ func TestService_GenerateToken(t *testing.T) {
 			inputUser: repository.User{
 				Password: "password",
 			},
-			mockBehavior: func(r *mock_repository.MockAuthorization, user repository.User) {
+			mockBehavior: func(r *mock_repository.MockAuthorization) {
 				r.EXPECT().GetUser("", "6673666466333434343464696a69736a64666a6466695baa61e4c9b93f3f0682250b6cf8331b7ee68fd8").Return(repository.User{
 					ID: 1,
 				}, errors.New("no username"))
@@ -73,7 +73,7 @@ func TestService_GenerateToken(t *testing.T) {
 			defer c.Finish()
 
 			repo := mock_repository.NewMockAuthorization(c)
-			test.mockBehavior(repo, test.inputUser)
+			test.mockBehavior(repo)
 
 			s := services.NewAuthService(repo)
 			_, err := s.GenerateToken(test.inputUser.Username, test.inputUser.Password)
