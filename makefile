@@ -1,5 +1,5 @@
 DEV_PORT=:5000
-PROD_PORT=:8080
+DOCKER_PORT=:8080
 
 MOCK_SOURCE=./internal/services/services.go
 MOCK_DESTINATION=./internal/services/mock/mock.go
@@ -25,21 +25,21 @@ logout:
 	@curl -v -b ./cookie.txt -X POST http://localhost${DEV_PORT}/auth/logout
 	@rm cookie.txt
 
-# PROD COMMANDS
-signupProd:
-	@curl -v -X POST -H 'Accept: application/json' -H 'Content-Type: application/json' --data '{"name":"larry", "username":"larr", "password":"123"}' http://localhost${PROD_PORT}/auth/sign-up
+# DOCKER COMMANDS
+signupDocker:
+	@curl -v -X POST -H 'Accept: application/json' -H 'Content-Type: application/json' --data '{"name":"larry", "username":"larr", "password":"123"}' http://localhost${DOCKER_PORT}/auth/sign-up
 
-signinProd:
-	@curl -v -c cookie.txt -X POST -H 'Accept: application/json' -H 'Content-Type: application/json' --data '{"username":"larr", "password":"123"}' http://localhost${PROD_PORT}/auth/sign-in
+signinDocker:
+	@curl -v -c cookie.txt -X POST -H 'Accept: application/json' -H 'Content-Type: application/json' --data '{"username":"larr", "password":"123"}' http://localhost${DOCKER_PORT}/auth/sign-in
 
-refreshProd:
-	@curl -v -b ./cookie.txt -c ./cookie.txt -X POST http://localhost${PROD_PORT}/auth/refresh-token
+refreshDocker:
+	@curl -v -b ./cookie.txt -c ./cookie.txt -X POST http://localhost${DOCKER_PORT}/auth/refresh-token
 
-apiProd:
-	@curl -v -b ./cookie.txt -X GET http://localhost${PROD_PORT}/api
+apiDocker:
+	@curl -v -b ./cookie.txt -X GET http://localhost${DOCKER_PORT}/api
 
-logoutProd:
-	@curl -v -b ./cookie.txt -X POST http://localhost${PROD_PORT}/auth/logout
+logoutDocker:
+	@curl -v -b ./cookie.txt -X POST http://localhost${DOCKER_PORT}/auth/logout
 	@rm cookie.txt
 
 
