@@ -25,4 +25,3 @@ Used as auth-service for simple-bank https://github.com/srjchsv/simplebank
 
 useful links:
 - jwt, clean architecture, project structure, patterns, api https://www.youtube.com/watch?v=1LFbmWk7NLQ&list=PLbTTxxr-hMmyFAvyn7DeOgNRN8BQdjFm8&index=1
-- loadbalancing, deploying https://codeburst.io/load-balancing-go-api-with-docker-nginx-digital-ocean-d7f05f7c9b31
