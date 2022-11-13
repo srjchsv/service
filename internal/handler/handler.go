@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -28,8 +27,8 @@ func (h *Handler) InitRouter(app *gin.Engine) *gin.Engine {
 	apiV1 := app.Group("/api", h.userIdentity)
 	apiV1.GET("", func(c *gin.Context) {
 		userID := c.GetInt("UserID")
-		c.JSON(http.StatusOK, gin.H{
-			"message": fmt.Sprintf("Hi user #%v you are in the secured route...", userID),
+		c.JSON(http.StatusOK, map[string]int{
+			"id": userID,
 		})
 	})
 

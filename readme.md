@@ -1,11 +1,8 @@
-## Educational project- Service
+## Educational project- Auth-Service
 
-### Currently made:
 - Authorization. And authentification using JWT
-- Load balancer and proxy nginx
 
-### To be made:
--More feature
+Used as auth-service for simple-bank https://github.com/srjchsv/simplebank
 
 ### To build and run containerized use `docker compose up --build`
 ### To run postgres db for dev and test use `docker compose up db`

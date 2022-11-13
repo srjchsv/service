@@ -54,6 +54,11 @@ func (h *Handler) signIn(c *gin.Context) {
 		return
 	}
 
+	userID, err := h.services.Authorization.ParseToken(token)
+	if err != nil {
+		newErrorReponse(c, http.StatusUnauthorized, err.Error())
+		return
+	}
 	c.SetCookie(
 		"access_token",
 		token,
@@ -65,6 +70,7 @@ func (h *Handler) signIn(c *gin.Context) {
 	)
 	c.JSON(http.StatusOK, map[string]interface{}{
 		"token": token,
+		"id":    userID,
 	})
 }
 
