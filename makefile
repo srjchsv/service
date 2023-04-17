@@ -1,3 +1,6 @@
+include .env
+export
+
 DEV_PORT=:5000
 DOCKER_PORT=:8080
 
@@ -58,7 +61,7 @@ mockgen:
 
 # MIGRATIONS
 up:
-	@goose -dir ./internal/repository/migrations postgres "user=user password=password dbname=db sslmode=disable" up
+	@goose -dir ./internal/repository/migrations postgres "host=localhost port=5430 user=user password=password dbname=db sslmode=disable" up
 
 down:
-	@goose -dir ./internal/repository/migrations  postgres "user=user password=password dbname=db sslmode=disable" down
+	@goose -dir ./internal/repository/migrations  postgres "host=localhost user=user password=password dbname=db sslmode=disable" down

@@ -18,11 +18,13 @@ type DbConfig struct {
 
 // ConnectToDB initializes db connection
 func ConnectToDB(config *DbConfig) (*sqlx.DB, error) {
-	conn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable",
-		config.Host,
+	conn := fmt.Sprintf("user=%s host=%s port=%s password=%s dbname=%s sslmode=disable",
 		config.Username,
+		config.Host,
+		config.Port,
 		config.Password,
 		config.DbName)
+
 	var err error
 	db, err := sqlx.Open("postgres", conn)
 	if err != nil {

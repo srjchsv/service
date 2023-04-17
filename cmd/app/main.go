@@ -26,6 +26,7 @@ func main() {
 		Password: os.Getenv("POSTGRES_PASSWORD"),
 		DbName:   os.Getenv("POSTGRES_DB"),
 		Pool:     os.Getenv("POSTGRES_POOL"),
+		Port:     os.Getenv("POSTGRES_PORT"),
 	}
 	db, err := repository.ConnectToDB(&dbConfig)
 	//Connect to db

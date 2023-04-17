@@ -1,1 +1,4 @@
 cookie.txt
+__debug_bin
+.vscode
+coverage.out
